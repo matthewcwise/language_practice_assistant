@@ -65,13 +65,13 @@ export default function App() {
       dataChannel.close();
     }
 
-    peerConnection.current.getSenders().forEach((sender) => {
-      if (sender.track) {
-        sender.track.stop();
-      }
-    });
-
     if (peerConnection.current) {
+      peerConnection.current.getSenders().forEach((sender) => {
+        if (sender.track) {
+          sender.track.stop();
+        }
+      });
+      
       peerConnection.current.close();
     }
 
@@ -145,18 +145,23 @@ export default function App() {
 
   return (
     <>
-      <nav className="absolute top-0 left-0 right-0 h-16 flex items-center">
-        <div className="flex items-center gap-4 w-full m-4 pb-2 border-0 border-b border-solid border-gray-200">
+      <nav className="absolute top-0 left-0 right-0 h-16 flex items-center bg-gradient-to-r from-blue-600 to-purple-600">
+        <div className="flex items-center gap-4 w-full m-4 pb-2 border-0 border-b border-solid border-blue-200">
           <img style={{ width: "24px" }} src={logo} />
-          <h1>realtime console</h1>
+          <h1 className="text-white font-bold">Language Practice Assistant</h1>
+          <div className="ml-auto flex gap-2">
+            <span className="text-white">🇺🇸</span>
+            <span className="text-white">🇪🇸</span>
+            <span className="text-white">🇨🇳</span>
+          </div>
         </div>
       </nav>
-      <main className="absolute top-16 left-0 right-0 bottom-0">
+      <main className="absolute top-16 left-0 right-0 bottom-0 bg-gray-50">
         <section className="absolute top-0 left-0 right-[380px] bottom-0 flex">
           <section className="absolute top-0 left-0 right-0 bottom-32 px-4 overflow-y-auto">
             <EventLog events={events} />
           </section>
-          <section className="absolute h-32 left-0 right-0 bottom-0 p-4">
+          <section className="absolute h-32 left-0 right-0 bottom-0 p-4 bg-white border-t border-gray-200">
             <SessionControls
               startSession={startSession}
               stopSession={stopSession}
@@ -167,7 +172,7 @@ export default function App() {
             />
           </section>
         </section>
-        <section className="absolute top-0 w-[380px] right-0 bottom-0 p-4 pt-0 overflow-y-auto">
+        <section className="absolute top-0 w-[380px] right-0 bottom-0 p-4 pt-0 overflow-y-auto border-l border-gray-200 bg-white shadow-lg">
           <ToolPanel
             sendClientEvent={sendClientEvent}
             sendTextMessage={sendTextMessage}
