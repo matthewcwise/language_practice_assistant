@@ -92,21 +92,31 @@ export default function ToolPanel({
   const applyLanguageSettings = () => {
     if (!isSessionActive) return;
     
+    console.log(`===== LANGUAGE SETTINGS =====`);
+    console.log(`Language: ${selectedLanguage.id} (${selectedLanguage.label})`);
+    console.log(`Level: ${selectedLevel.id}`);
+    
+    // Create instructions for the model
+    const instructions = `
+      You are a language tutor helping the user practice ${selectedLanguage.id} at ${selectedLevel.id} level.
+      You should ONLY speak in ${selectedLanguage.id}.
+      
+      For ${selectedLevel.id} level:
+      ${selectedLevel.id === "Beginner" ? "Use simple vocabulary and basic sentence structures. Speak slowly and clearly. Correct basic mistakes gently." : ""}
+      ${selectedLevel.id === "Intermediate" ? "Use moderate vocabulary and varied sentences. Introduce some idioms and expressions. Correct errors when they hinder understanding." : ""}
+      ${selectedLevel.id === "Advanced" ? "Use advanced vocabulary, complex sentences, idioms, and cultural references. Correct subtle errors and discuss nuances of language." : ""}
+      
+      Start by introducing yourself as a ${selectedLanguage.id} language tutor and suggest a topic to discuss in ${selectedLanguage.id}.
+    `;
+    
+    console.log(`Instructions being sent to model:`);
+    console.log(instructions);
+    
     // Send the instruction to the model
     sendClientEvent({
       type: "response.create",
       response: {
-        instructions: `
-          You are a language tutor helping the user practice ${selectedLanguage.id} at ${selectedLevel.id} level.
-          You should ONLY speak in ${selectedLanguage.id}.
-          
-          For ${selectedLevel.id} level:
-          ${selectedLevel.id === "Beginner" ? "Use simple vocabulary and basic sentence structures. Speak slowly and clearly. Correct basic mistakes gently." : ""}
-          ${selectedLevel.id === "Intermediate" ? "Use moderate vocabulary and varied sentences. Introduce some idioms and expressions. Correct errors when they hinder understanding." : ""}
-          ${selectedLevel.id === "Advanced" ? "Use advanced vocabulary, complex sentences, idioms, and cultural references. Correct subtle errors and discuss nuances of language." : ""}
-          
-          Start by introducing yourself as a ${selectedLanguage.id} language tutor and suggest a topic to discuss in ${selectedLanguage.id}.
-        `,
+        instructions: instructions,
       },
     });
     
@@ -163,6 +173,21 @@ export default function ToolPanel({
     }
   }, [events]);
 
+  // Log events for debugging
+  useEffect(() => {
+    if (!events || events.length === 0) return;
+    
+    const mostRecentEvent = events[0];
+    
+    // Log when we receive responses from the model
+    if (mostRecentEvent && (mostRecentEvent.type === "response.chunk" || mostRecentEvent.type === "response.done")) {
+      console.log(`Received model response [${mostRecentEvent.type}]`);
+      if (mostRecentEvent.response && mostRecentEvent.response.output) {
+        console.log(`Model output:`, mostRecentEvent.response.output);
+      }
+    }
+  }, [events]);
+
   return (
     <section className="h-full w-full flex flex-col gap-4">
       <div className="h-full bg-gray-50 rounded-md p-4">
@@ -180,7 +205,10 @@ export default function ToolPanel({
                     ? "bg-blue-100 border border-blue-400" 
                     : "bg-white border border-gray-200 hover:bg-gray-100"
                 }`}
-                onClick={() => setSelectedLanguage(language)}
+                onClick={() => {
+                  console.log(`Language selected: ${language.id}`);
+                  setSelectedLanguage(language);
+                }}
               >
                 <span className="mr-2 text-xl">{language.flag}</span>
                 <span>{language.label}</span>
@@ -201,7 +229,10 @@ export default function ToolPanel({
                     ? "bg-blue-100 border border-blue-400" 
                     : "bg-white border border-gray-200 hover:bg-gray-100"
                 }`}
-                onClick={() => setSelectedLevel(level)}
+                onClick={() => {
+                  console.log(`Level selected: ${level.id}`);
+                  setSelectedLevel(level);
+                }}
               >
                 {level.label}
               </div>
