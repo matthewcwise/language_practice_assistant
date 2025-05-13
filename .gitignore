@@ -19,3 +19,7 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+realtime_api_documentation.md
+
+/uploads/*

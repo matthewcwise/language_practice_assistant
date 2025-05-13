@@ -1,5 +1,18 @@
 import { useEffect, useState } from "react";
 
+// Set to false to reduce console log verbosity
+const DEBUG = false;
+
+// Helper function for conditional logging
+const log = (message, ...args) => {
+  if (DEBUG) console.log(message, ...args);
+};
+
+// Only log important events regardless of debug mode
+const logImportant = (message, ...args) => {
+  console.log(message, ...args);
+};
+
 // Languages and difficulty levels available
 const LANGUAGES = [
   { id: "English", label: "English", flag: "🇺🇸" },
@@ -92,9 +105,9 @@ export default function ToolPanel({
   const applyLanguageSettings = () => {
     if (!isSessionActive) return;
     
-    console.log(`===== LANGUAGE SETTINGS =====`);
-    console.log(`Language: ${selectedLanguage.id} (${selectedLanguage.label})`);
-    console.log(`Level: ${selectedLevel.id}`);
+    logImportant(`===== LANGUAGE SETTINGS =====`);
+    logImportant(`Language: ${selectedLanguage.id} (${selectedLanguage.label})`);
+    logImportant(`Level: ${selectedLevel.id}`);
     
     // Create instructions for the model
     const instructions = `
@@ -109,8 +122,7 @@ export default function ToolPanel({
       Start by introducing yourself as a ${selectedLanguage.id} language tutor and suggest a topic to discuss in ${selectedLanguage.id}.
     `;
     
-    console.log(`Instructions being sent to model:`);
-    console.log(instructions);
+    log(`Instructions being sent to model:`, instructions);
     
     // Send the instruction to the model
     sendClientEvent({
@@ -173,17 +185,16 @@ export default function ToolPanel({
     }
   }, [events]);
 
-  // Log events for debugging
+  // Log only critical model responses
   useEffect(() => {
     if (!events || events.length === 0) return;
     
     const mostRecentEvent = events[0];
     
-    // Log when we receive responses from the model
-    if (mostRecentEvent && (mostRecentEvent.type === "response.chunk" || mostRecentEvent.type === "response.done")) {
-      console.log(`Received model response [${mostRecentEvent.type}]`);
+    // Only log response.done events with output
+    if (DEBUG && mostRecentEvent && mostRecentEvent.type === "response.done") {
       if (mostRecentEvent.response && mostRecentEvent.response.output) {
-        console.log(`Model output:`, mostRecentEvent.response.output);
+        log("Model output:", mostRecentEvent.response.output);
       }
     }
   }, [events]);
@@ -206,7 +217,7 @@ export default function ToolPanel({
                     : "bg-white border border-gray-200 hover:bg-gray-100"
                 }`}
                 onClick={() => {
-                  console.log(`Language selected: ${language.id}`);
+                  log(`Language selected: ${language.id}`);
                   setSelectedLanguage(language);
                 }}
               >
@@ -230,7 +241,7 @@ export default function ToolPanel({
                     : "bg-white border border-gray-200 hover:bg-gray-100"
                 }`}
                 onClick={() => {
-                  console.log(`Level selected: ${level.id}`);
+                  log(`Level selected: ${level.id}`);
                   setSelectedLevel(level);
                 }}
               >
