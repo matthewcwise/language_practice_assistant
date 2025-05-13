@@ -1,17 +1,9 @@
 import { useEffect, useState } from "react";
+import { log, logImportant, logLanguage } from '../services/logger';
 
 // Set to false to reduce console log verbosity
 const DEBUG = false;
 
-// Helper function for conditional logging
-const log = (message, ...args) => {
-  if (DEBUG) console.log(message, ...args);
-};
-
-// Only log important events regardless of debug mode
-const logImportant = (message, ...args) => {
-  console.log(message, ...args);
-};
 
 // Languages and difficulty levels available
 const LANGUAGES = [
@@ -93,6 +85,7 @@ export default function ToolPanel({
   isSessionActive,
   sendClientEvent,
   events,
+  currentLanguage
 }) {
   const [selectedLanguage, setSelectedLanguage] = useState(LANGUAGES[0]);
   const [selectedLevel, setSelectedLevel] = useState(LEVELS[0]);
@@ -105,9 +98,12 @@ export default function ToolPanel({
   const applyLanguageSettings = () => {
     if (!isSessionActive) return;
     
-    logImportant(`===== LANGUAGE SETTINGS =====`);
-    logImportant(`Language: ${selectedLanguage.id} (${selectedLanguage.label})`);
-    logImportant(`Level: ${selectedLevel.id}`);
+    // Enhanced logging with more visibility
+    logLanguage(`========================================`);
+    logLanguage(`LANGUAGE SETTINGS APPLIED TO VOICE MODEL`);
+    logLanguage(`Language: ${selectedLanguage.id} (${selectedLanguage.label}) ${selectedLanguage.flag}`);
+    logLanguage(`Proficiency Level: ${selectedLevel.id}`);
+    logLanguage(`========================================`);
     
     // Create instructions for the model
     const instructions = `
@@ -122,7 +118,9 @@ export default function ToolPanel({
       Start by introducing yourself as a ${selectedLanguage.id} language tutor and suggest a topic to discuss in ${selectedLanguage.id}.
     `;
     
-    log(`Instructions being sent to model:`, instructions);
+    // Log the full instructions
+    logLanguage(`Instructions sent to model for ${selectedLanguage.id} practice:`);
+    logLanguage(instructions);
     
     // Send the instruction to the model
     sendClientEvent({
@@ -203,6 +201,14 @@ export default function ToolPanel({
     <section className="h-full w-full flex flex-col gap-4">
       <div className="h-full bg-gray-50 rounded-md p-4">
         <h2 className="text-lg font-bold mb-4">Language Practice Settings</h2>
+        
+        {/* Current language indicator */}
+        {isSessionActive && currentLanguage !== "Unknown" && (
+          <div className="mb-4 p-2 bg-purple-100 border border-purple-300 rounded-md">
+            <p className="text-sm font-medium">Currently active language:</p>
+            <p className="font-bold text-purple-800">{currentLanguage}</p>
+          </div>
+        )}
         
         {/* Language Selection */}
         <div className="mb-6">

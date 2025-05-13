@@ -16,7 +16,8 @@ export default function LanguagePracticePage() {
   
   const {
     events,
-    sendClientEvent
+    sendClientEvent,
+    currentLanguage
   } = useDataChannel(dataChannel, setIsSessionActive);
 
   return (
@@ -47,6 +48,7 @@ export default function LanguagePracticePage() {
             sendClientEvent={sendClientEvent}
             events={events}
             isSessionActive={isSessionActive}
+            currentLanguage={currentLanguage}
           />
         </section>
       </main>
